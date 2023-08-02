@@ -176,4 +176,3 @@ class ModifiedStartReact:
 
 
 
-ModifiedStartReact().run()
