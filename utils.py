@@ -10,7 +10,7 @@ from psychopy import visual, core, sound, event, logging
 
 
 import numpy as np
-from cerebus import cbpy
+# from cerebus import cbpy
 
 def wait_for_click(win, visual):
     """
@@ -74,7 +74,7 @@ def presentBlock(win, blockText, blockLog):
 
     wait_for_click(win, block_instruction)
     
-    cbpy.set_comment(blockLog + ": start")
+    # cbpy.set_comment(blockLog + ": start")
 
 
 # returns true if the escape key is pressed, false otherwise
@@ -124,7 +124,7 @@ def presentTrials(win, expInfo, stimParams, blockText, logFile, numTrials, sound
             win.flip()
             
             
-            cbpy.set_comment(blockText + " T " + str(trial) + " P" + str(soundStrengths[trial]))
+            # cbpy.set_comment(blockText + " T " + str(trial) + " P" + str(soundStrengths[trial]))
             core.wait(stimParams['STIMULUS_DURATION'])
         
 

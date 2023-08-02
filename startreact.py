@@ -8,12 +8,13 @@ import os  # handy system and path functions
 import sys  # to get file system encoding
 import utils
 
+
 #os.add_dll_directory(os.path.join(os.environ['Conda_prefix'],"Lib/site-packages/PyQt5/Qt5/bin")) # Fix required for cerebus for python > 3.8
 
-from psychopy import prefs
-prefs.hardware['audioLib'] = ['PTB']
-prefs.hardware['audioLatencyMode'] = 4
-prefs.hardware['audioDriver'] = 'Primary Sound'
+# from psychopy import prefs
+# prefs.hardware['audioLib'] = ['PTB']
+# prefs.hardware['audioLatencyMode'] = 4
+# prefs.hardware['audioDriver'] = 'Primary Sound'
 
 
 from psychopy import locale_setup, sound, gui, visual, core, data, event, logging, clock, colors
@@ -22,23 +23,23 @@ from psychopy.constants import (NOT_STARTED, STARTED, PLAYING, PAUSED,
                                 STOPPED, FINISHED, PRESSED, RELEASED, FOREVER)
 from psychopy.hardware import keyboard
 from startreact_parameters import get_startreact_parameters, defFixation, defStimulus, stimParameters
-from cerebus import cbpy
+# from cerebus import cbpy
 
 # %% Setup connection to blackrock amplifier
-blackrock_ConnectionParameters = cbpy.defaultConParams()
-blackrock_ConnectionParameters['client-addr']='192.168.137.3'
-try:
-    cbpy.open(parameter=blackrock_ConnectionParameters)
-    print("Sending timestamps.....")
-except RuntimeError:
-    print("Could not connect to blackrock amplifier")
+# blackrock_ConnectionParameters = cbpy.defaultConParams()
+# blackrock_ConnectionParameters['client-addr']='192.168.137.3'
+# try:
+#     cbpy.open(parameter=blackrock_ConnectionParameters)
+#     print("Sending timestamps.....")
+# except RuntimeError:
+#     print("Could not connect to blackrock amplifier")
 
 # %% Experiment parameters
 
 
 expInfo, logFile = get_startreact_parameters()
 #was true  
-win = visual.Window([800,600], fullscr= True, monitor="testMonitor", units="cm",color="white")
+win = visual.Window([800,600], fullscr= False, monitor="testMonitor", units="cm",color="white")
 stimulus = defStimulus(win)
 fixation = defFixation(win)
 stimParams = stimParameters()
@@ -76,6 +77,6 @@ for block in range(expInfo['Block Start'],  expInfo['Blocks']):
 
 # make sure everything is closed down
 
-cbpy.close()
+# cbpy.close()
 win.close()
 core.quit()
