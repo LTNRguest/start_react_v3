@@ -38,8 +38,11 @@ from startreact_parameters import get_startreact_parameters, defFixation, defSti
 
 
 expInfo, logFile = get_startreact_parameters()
+print("expInfo is", expInfo)
+
 #was true  
 win = visual.Window([800,600], fullscr= False, monitor="testMonitor", units="cm",color="white")
+
 stimulus = defStimulus(win)
 fixation = defFixation(win)
 stimParams = stimParameters()
@@ -48,22 +51,23 @@ stimParams = stimParameters()
 print("Starting experiment...")
 
 for block in range(expInfo['Block Start'],  expInfo['Blocks']):
-    if (block == 0 and expInfo['Practice Trials'] > 0):
+    # if (block == 0 and expInfo['Practice Trials'] > 0):
         # do a practice block
-        test_run_instruction = visual.TextStim(win,
-            text=expInfo['TEST_RUN_TEXT'], color="black"
-        )
+        # test_run_instruction = visual.TextStim(win,
+            # text=expInfo['TEST_RUN_TEXT'], color="black"
+        # )
  
-        sounds_practice = np.zeros(expInfo['Practice Trials'], dtype=int)
-        for i in range (expInfo['Practice Trials']):
-            sounds_practice[i] = i % stimParams['NUM_SOUNDS']
-        
-        text=expInfo['TEST_RUN_TEXT']
-        utils.presentBlock(win,text, 'P' + str(block+1))
-        utils.presentTrials(win, expInfo, stimParams, 'P' + str(block+1), logFile, expInfo['Practice Trials'], sounds_practice, fixation, stimulus)
+        # sounds_practice = np.zeros(expInfo['Practice Trials'], dtype=int)
+        # for i in range (expInfo['Practice Trials']):
+            # sounds_practice[i] = i % stimParams['NUM_SOUNDS']
+        # 
+        # text=expInfo['TEST_RUN_TEXT']
+        # utils.presentBlock(win,text, 'P' + str(block+1))
+        # utils.presentTrials(win, expInfo, stimParams, 'P' + str(block+1), logFile, expInfo['Practice Trials'], sounds_practice, fixation, stimulus)
 
     #randomize order of presented stimuli
     sounds_random = np.tile(np.arange(stimParams['NUM_SOUNDS']), int(expInfo['Trials per Block']/stimParams['NUM_SOUNDS']))
+    print("sounds random is", sounds_random)
     np.random.shuffle(sounds_random)
 
     # Present block instructions
@@ -72,6 +76,7 @@ for block in range(expInfo['Block Start'],  expInfo['Blocks']):
     
 
     utils.presentBlock(win, text, 'B' + str(block+1))
+    # def presentTrials(win, expInfo, stimParams, blockText, logFile, numTrials, soundStrengths, fixation, stimulus):
     utils.presentTrials(win, expInfo, stimParams, 'B' + str(block+1), logFile, expInfo['Trials per Block'], sounds_random, fixation, stimulus)
     
 

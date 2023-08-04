@@ -77,6 +77,15 @@ def presentBlock(win, blockText, blockLog):
     # cbpy.set_comment(blockLog + ": start")
 
 
+def mod_present_block(start_react_obj, blockText, blockLog):
+
+    block_instruction = visual.TextStim(start_react_obj.WIN, blockText, color="black")
+
+    wait_for_click(start_react_obj.WIN, block_instruction)
+    
+    # cbpy.set_comment(blockLog + ": start")
+
+
 # returns true if the escape key is pressed, false otherwise
 def is_escape_pressed(win):
 
@@ -94,17 +103,39 @@ def quit(win):
     sys.exit()
 
 
-def presentTrials(win, expInfo, stimParams, blockText, logFile, numTrials, soundStrengths, fixation, stimulus):
+def present_modified_trials(start_react_obj, sounds_random_array, 
+                            exp_info_dict, block_num): 
 
+    num_trials = exp_info_dict["Trials per Block"]
+
+    for trial_num in range(num_trials): 
+        curr_trial_num = trial_num + 1
+        loudness_key = sounds_random_array[trial_num]
+        start_react_obj.run_experiment(loudness_key, block_num, curr_trial_num)
+
+        # cbpy.set_comment("B " + str(block_num) + " T " + str(trial_num) + " P" + str(loudness_key))
+
+
+
+
+
+
+
+
+def presentTrials(win, expInfo, stimParams, blockText, logFile, numTrials, soundStrengths, fixation, stimulus):
         total_time = 0
         current_time = core.getTime()
+
+        # go for var number of trials 
         for trial in range(numTrials):
             quit_if_escape(win)
                 
         
             # Fixation
             time_up = np.random.uniform(expInfo['DELAY_MIN'], expInfo['DELAY_MAX'] ) # Picks pause time between delay_min and delay_max seconds
+            print("time up is ", time_up)
             # Stimulus
+            #pick int 0 1 or 2 from array
             sound_picker = soundStrengths[trial]            
             sound_used = stimParams['sound_used'][sound_picker]              
 
@@ -127,6 +158,7 @@ def presentTrials(win, expInfo, stimParams, blockText, logFile, numTrials, sound
             # cbpy.set_comment(blockText + " T " + str(trial) + " P" + str(soundStrengths[trial]))
             core.wait(stimParams['STIMULUS_DURATION'])
         
+            print("block text is ", blockText)
 
             logFile.write(blockText + " Trial %d, Loudness: %d, Pause: %.3f, Trial Time: %.3f \n" %(trial+1, sound_picker, time_up, core.getTime()))
             print(blockText +         " Trial %d, Loudness: %d, Pause: %.3f, Trial Time: %.3f \n" %(trial+1, sound_picker, time_up, core.getTime()))

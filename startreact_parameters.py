@@ -88,6 +88,7 @@ def stimParameters():
     stimParams['STIMULUS_DURATION'] = 0.02 # 20 ms
 
 # Sound Parameters 
+    stimParameters["READY"]     = 80
     stimParams['NUM_SOUNDS']    = 3
     stimParams['QUIET_DB']      = 80 # db
     stimParams['QUIET_HZ']      = 500 # Hz

@@ -1,7 +1,7 @@
 """
 modified_startreact.py 
 Author: Nadim Barakat
-Date: 8/3/2023
+Date: 8/2/2023
 
 
 Purpose: This class presents shapes and sound to users as it is used
@@ -9,11 +9,11 @@ in conjuction with other monitoring to assess reaction times.
 
 Here is the current workflow of this module 
 
-display "+" until any key pressed -> a buffer of 1.5 seconds ->
-a yellow square is displayed for 80 ms. A sound at 80 dB is also 
-played -> a buffer of 3.5 seconds -> a green circle is shown 
-for 50 ms along with a sound of 125 dB -> buffer of 2 seconds ->
-end. 
+display "+" until any key pressed -> a buffer of 1-1.5 seconds picked at random 
+-> a yellow square is displayed for 80 ms. A sound at 80 dB is also 
+played -> a random buffer of 2.5 - 3.5 seconds -> a green circle is shown 
+for 50 ms along with either no sound, 80db or 125 db at random
+-> buffer of 2 seconds -> end. escape can be clicked at any time to quit
 
 
 Modules needed: 
@@ -22,14 +22,21 @@ Modules needed:
     you need the utils file (I am not the author of that file)
 
 Current usage: 
-    create an instance of the class and call the run() method.
+    create an instance of the class with a log file inside the 
+    constructor then call run_experiment
 
-    ModifiedStartReact().run()
+    start_react_obj = ModifiedStartReact(your_log_file)
+    start_react_obj.run_experiment(loudness_key, block_num, curr_trial_num)
+
+
+   
 
 """
 
 from psychopy import visual, core, event
 from utils import get_audio
+import random 
+import sys 
 
 
 class ModifiedStartReact: 
@@ -44,20 +51,28 @@ class ModifiedStartReact:
     SHORT_DISPLAY_TIME = 0.5 
     LONG_DISPLAY_TIME  = 0.8
 
-    # this is time after a stimulus is shown. Blank screen is shown during
-    # this time. 
-    SHORT_BUFFER_TIME  = 1.5 
-    MEDIUM_BUFFER_TIME = 2.0
-    LONG_BUFFER_TIME   = 3.5 
+
+    LOW_END_SHORT_JITTER  = 1.0 
+    HIGH_END_SHORT_JITTER = 1.5
+    LOW_END_LONG_JITTER   = 2.5
+    HIGH_END_LONG_JITTER  = 3.5
+
+    SPEAKER_LAG_TIME = 0.085 
+
+    LOUDNESS_SEQ = {0 : "silent", 1 : "quiet", 2 : "loud"}
+
 
     # this size may need to be configured for the computer in the VA
     # change to fullscr = True for full screen  
-    WIN = visual.Window(size = (800, 600),  monitor = "testMonitor", 
-                            fullscr = False, allowGUI = True)
+    WIN = visual.Window([800,600], fullscr= False, 
+                        monitor="testMonitor",units = "cm" , color="gray")
+
+    def __init__(self, log_file): 
+        self.log_file = log_file
 
     # draws a + icon to the screen. does not remove the icon 
     def draw_plus(self): 
-        size = 0.1
+        size = 2
         line1 = visual.Line(self.WIN, start=(-size, 0), end=(size, 0), 
                                 lineWidth=2)
         
@@ -74,7 +89,9 @@ class ModifiedStartReact:
     # time (time_seconds) on blank screen 
     def display_plus_until_click(self, time_seconds): 
         self.draw_plus()
+        self.quit_if_escape()
         event.waitKeys()
+        
 
         # clear the screen after user clicks 
         self.WIN.flip()
@@ -82,7 +99,7 @@ class ModifiedStartReact:
 
     # return a square object that is yellow 
     def create_square(self): 
-        square_side_len = 0.2
+        square_side_len = 2
         square = visual.Rect(self.WIN, width = square_side_len, 
                                 height = square_side_len, fillColor = 'yellow')
     
@@ -90,7 +107,7 @@ class ModifiedStartReact:
     
     # returns a circle object that is green 
     def create_circle(self): 
-        circle_radius = 0.3
+        circle_radius = 2
         circle_position = (0, 0)
 
         circle = visual.Circle(self.WIN, radius = circle_radius, size = 0.9, 
@@ -103,6 +120,11 @@ class ModifiedStartReact:
         shape.draw()
         self.WIN.flip()
 
+
+
+    def get_loudness_keyword(self, loudness_int): 
+        return self.LOUDNESS_SEQ[loudness_int]
+    
 
     # plays a sound of a certain strength depending on provided keyword
 
@@ -141,11 +163,17 @@ class ModifiedStartReact:
     #                       erasing it from screen 
     #       buffer_time: (int or float): time of blank screen after removing
     #                       shape 
-    def draw_shape_play_sound_wait(self, shape, sound_keyword, display_time, 
-                                buffer_time): 
+    def play_sound_draw_log(self, shape, sound_keyword, display_time, 
+                                buffer_time, block_num, trial_num): 
        
+        self.quit_if_escape()
+
         shape = shape.lower()
         shape_obj = None 
+
+        sound = self.play_sound(sound_keyword)
+
+        core.wait(self.SPEAKER_LAG_TIME)
 
         if shape == "square": 
             shape_obj = self.create_square()
@@ -153,7 +181,6 @@ class ModifiedStartReact:
             shape_obj = self.create_circle()
 
         self.draw_shape(shape_obj)
-        sound = self.play_sound(sound_keyword)
 
         core.wait(display_time)
 
@@ -161,18 +188,50 @@ class ModifiedStartReact:
 
         core.wait(buffer_time)
 
+        log_str = (f"Block Number: {block_num}, Trial Number: {trial_num}, " 
+                   f"Shape: {shape}, Loudness: {sound_keyword}, Jitter: {buffer_time}, "
+                   f"Trial Time: {round(core.getTime(), 2)}\n")
+
+        self.log_file.write(log_str)
+
+        self.quit_if_escape()
+
+
+    def create_jitter_time(self, jitter_type_keyword):
+
+        jitter_time = None
+        if jitter_type_keyword == "short": 
+            jitter_time = random.uniform(self.LOW_END_SHORT_JITTER, 
+                                         self.HIGH_END_SHORT_JITTER)
+            
+        elif jitter_type_keyword == "long": 
+            jitter_time = random.uniform(self.LOW_END_LONG_JITTER, 
+                                         self.HIGH_END_LONG_JITTER)
+
+        return round(jitter_time, 2)
+
+    def quit_if_escape(self): 
+        keys = event.getKeys()
+
+        if "escape" in keys: 
+            self.WIN.close()
+            sys.exit() 
+
     # "public" function of this class. 
     # performs workflow specified in file header 
-    def run(self): 
+    # loudness key is int
+    def run_experiment(self, loudness_key, block_num, trial_num):
+
+        loudness_str = self.get_loudness_keyword(loudness_key)
+
         self.display_plus_until_click(self.SHORT_BUFFER_TIME)
 
-        self.draw_shape_play_sound_wait("square", "quiet", 
-                            self.LONG_DISPLAY_TIME, self.LONG_BUFFER_TIME)
+        self.play_sound_draw_log("square", "quiet", 
+                            self.LONG_DISPLAY_TIME, 
+                            self.create_jitter_time("short"),
+                            block_num, trial_num)
         
-        self.draw_shape_play_sound_wait("circle", "loud",
-                            self.SHORT_DISPLAY_TIME, self.MEDIUM_BUFFER_TIME)
-        self.WIN.close()
-
-
-
-
+        self.play_sound_draw_log("circle", loudness_str,
+                            self.SHORT_DISPLAY_TIME, 
+                            self.create_jitter_time("long"), 
+                            block_num, trial_num)
