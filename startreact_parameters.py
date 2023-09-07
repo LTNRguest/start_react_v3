@@ -12,10 +12,10 @@ def get_startreact_parameters():
     # Store info about the experiment session
     expInfo = {
         'ID': '',
-        'Blocks': 5, # 5 plus practice
+        'Blocks': 3, # 5 plus practice
         'Practice Trials': 3,
         'Trials per Block': 15,
-        'Block Start (Please only input 1, 2, 3, 4, or 5)': 1, #1-5
+        'Block Start (Please only input 1, 2, 3)': 1, #1-5
         # ^ pick what trial you want to start at if you need to restart the experiment
         'Other Notes': '',
     }
@@ -32,19 +32,17 @@ def get_startreact_parameters():
     expInfo['psychopyVersion']  = '2021.2.3'
     expInfo['Date']             = data.getDateStr()  # add a simple timestamp
    
-    expInfo['Block Start']      = expInfo['Block Start (Please only input 1, 2, 3, 4, or 5)'] - 1
+    expInfo['Block Start']      = expInfo['Block Start (Please only input 1, 2, 3)'] - 1
     #expInfo['Practice Trials']  = 3
     #expInfo['TOTAL_TRIALS']     = NUM_TRIALS + PRACTICE_TRIALS
-    expInfo['SHORT_DELAY_MIN']        = 2.5 # seconds
-    expInfo['SHORT_DELAY_MAX']        = 3.5 # seconds
+    expInfo['SHORT_DELAY_MIN']        = 2 # seconds
+    expInfo['SHORT_DELAY_MAX']        = 2 # seconds
     expInfo['LONG_DELAY_MIN']         = 2.5 # seconds
     expInfo['LONG_DELAY_MAX']         = 3.5 # seconds
     expInfo['FIXED_SPEAKER_DELAY']    = 0.085 # seconds
 
-    expInfo['BLOCK_TEXTS']      = np.array(["Raise your arm to the side", 
-                                            "Bend your elbow", 
-                                            "Extend your elbow", 
-                                            "Lift your wrist", 
+    expInfo['BLOCK_TEXTS']      = np.array(["Bend your elbow", 
+                                            "Straighten your elbow", 
                                             "Move your index finger towards your thumb"])
     expInfo['TEST_RUN_TEXT']    = "Practice Trials. Press any key to start"
 
@@ -106,7 +104,7 @@ def stimParameters():
 
 # Sound Parameters 
     stimParams['NUM_SOUNDS']    = 3
-    stimParams['QUIET_DB']      = 80 # db
+    stimParams['QUIET_DB']      = 60 # db
     stimParams['QUIET_HZ']      = 500 # Hz
     stimParams['QUIET_TIME']    = 1/20 # 50 ms
 
